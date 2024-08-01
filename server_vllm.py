@@ -134,6 +134,8 @@ if __name__ == "__main__":
     )
     # Overwrite vLLM's default ModelConfig.max_logprobs of 5
     engine_args.max_logprobs = len(tokenizer.vocab.keys())
+    if served_model == "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4":
+        engine_args.quantization = 'AWQ'
 
     engine = AsyncLLMEngine.from_engine_args(engine_args)
     engine_model_config = asyncio.run(engine.get_model_config())

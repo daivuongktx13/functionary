@@ -68,7 +68,7 @@ def get_prompt_template_from_tokenizer(tokenizer: Any) -> PromptTemplate:
     p5 = _TEMPLATE_DIC[LlavaLlama.version]
     p6 = _TEMPLATE_DIC[Llama31Template.version]
 
-    if 'meta-llama/Meta-Llama-3.1' in tokenizer.name_or_path:
+    if 'Meta-Llama-3.1' in tokenizer.name_or_path:
         return p6
 
     token_ids = tokenizer.encode(p3.function_separator, add_special_tokens=False)
