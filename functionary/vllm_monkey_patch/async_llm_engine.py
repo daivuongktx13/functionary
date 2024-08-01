@@ -250,7 +250,8 @@ class _AsyncLLMEngine(LLMEngine):
         and updates the scheduler with the model outputs. Finally, it decodes
         the sequences and returns the newly generated results.
         """
-        seq_group_metadata_list, scheduler_outputs = self.scheduler.schedule()
+        assert len(self.scheduler) == 1
+        seq_group_metadata_list, scheduler_outputs = self.scheduler[0].schedule()
 
         tokenizer = self.get_tokenizer()
 
@@ -407,6 +408,7 @@ class _AsyncLLMEngine(LLMEngine):
             params=params,
             arrival_time=arrival_time,
             lora_request=lora_request,
+            prompt_adapter_request=None # Wth, why it is missing?
         )
 
     async def check_health_async(self) -> None:
@@ -515,7 +517,7 @@ class AsyncLLMEngine:
             executor_class=executor_class,
             log_requests=not engine_args.disable_log_requests,
             log_stats=not engine_args.disable_log_stats,
-            max_log_len=engine_args.max_log_len,
+            # max_log_len=engine_args.max_log_len,
             start_engine_loop=start_engine_loop,
             usage_context=usage_context,
         )

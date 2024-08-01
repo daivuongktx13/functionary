@@ -115,7 +115,7 @@ async def check_length(request, input_ids, model_config):
         # From vLLM's code, it seems like only YaRN requires
         # "original_max_position_embeddings" in rope_scaling dict
         # https://github.com/vllm-project/vllm/blob/main/vllm/config.py#L1458-L1460
-        if model_config.hf_config.rope_scaling["type"] == "yarn":
+        if hasattr(model_config.hf_config.rope_scaling, "type") and model_config.hf_config.rope_scaling["type"] == "yarn":
             context_len = model_config.hf_config.rope_scaling[
                 "original_max_position_embeddings"
             ]

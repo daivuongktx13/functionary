@@ -1,7 +1,8 @@
 from typing import Dict, List, Optional, Union
 
 import torch
-from lmformatenforcer import CharacterLevelParser, JsonSchemaParser
+from dataclasses import dataclass
+from lmformatenforcer import CharacterLevelParser, JsonSchemaParser, CharacterLevelParserConfig
 from lmformatenforcer.integrations.vllm import build_vllm_logits_processor
 from transformers import (
     LlamaForCausalLM,
@@ -20,6 +21,11 @@ from functionary.prompt_template import get_prompt_template_from_tokenizer
 from functionary.prompt_template.prompt_utils import prepare_messages_for_inference
 from functionary.inference_utils import StopWordsCriteria
 
+
+VI_COMPLETE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+-=[]{};:,./<>? `'\"àáảãạâầấẩẫậăằắẳẵặèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđÀÁẢÃẠÂẦẤẨẪẬĂẰẮẲẴẶÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ"
+@dataclass
+class MyCharacterLevelParserConfig(CharacterLevelParserConfig):
+    alphabet: str = VI_COMPLETE_ALPHABET
 
 def tokenize(message: ChatMessage, tokenizer: LlamaTokenizer, device="cuda:0"):
     text = str(message)
@@ -117,7 +123,7 @@ async def get_lm_format_enforcer_vllm_logits_processor_from_tool_name(
             raw_tool_schema = tool_or_function["parameters"]
             break
     schema = _normalize_json_schema_object(raw_tool_schema)
-    character_level_parser = JsonSchemaParser(schema)
+    character_level_parser = JsonSchemaParser(schema, MyCharacterLevelParserConfig())
     logits_processor = build_vllm_logits_processor(
         tokenizer_data, character_level_parser
     )
