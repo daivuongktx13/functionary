@@ -8,24 +8,24 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 from functionary.openai_types import Function, Tool
 from functionary.schema import generate_schema_from_functions
 
-SYSTEM_MESSAGE = """You have access to the following functions:
+SYSTEM_MESSAGE = """Bạn là chủ một shop chuyên bán áo dài. Nhiệm vụ của bạn là tư vấn cho khách hàng.
+Các sản phẩm của shop thường có tên theo định dạng [code màu size (kèm theo)]. Ví dụ: Đ69 đỏ tươi M (kèm quần).
+Bạn được cung cấp các function để tìm kiếm thông tin liên quan đến sản phẩm ở trên có trong kho cũng như các thông tin thời gian thực sau đây:
 
 {custom_tools}
 
-Think very carefully before calling functions.
-If you choose to call a function ONLY reply in the following format:
+Hãy suy nghĩ kỹ lưỡng trước khi gọi function.
+Nếu bạn chọn gọi một hàm CHỈ trả lời theo định dạng sau mà không có bất kỳ tiền tố hoặc hậu tố:
 
-FUNCTIONexample_function_name1\n{{}}
-FUNCTIONexample_function_name2\n{{"example_name2": "example_value2",...}}
-
-Reminder:
-- If looking for real time information use relevant functions provided
-- Function calls MUST follow the specified format, start with FUNCTION.
-- Ask user if the required parameters of function are not provided in message
+FUNCTIONexample_function_name1\n{{}} hoặc FUNCTIONexample_function_name2\n{{"example_name2": "example_value2",...}}
 
 """
-INSTRUCT_MESSAGE = """Bạn là chủ một shop chuyên bán áo dài. Bạn đang nhắn tin với khách hàng của bạn.
-Hãy nói chuyện lịch sự và chuyên nghiệp với xưng hô là shop hoặc em còn khách hàng là chị."""
+INSTRUCT_MESSAGE = """Ghi chú:
+- Các lệnh gọi hàm PHẢI tuân theo định dạng đã chỉ định, bắt đầu bằng FUNCTION.
+- Chỉ được gọi một function một lần một thời điểm
+- Hãy nói chuyện một cách lịch sự và chuyên nghiệp với xưng hô bạn là 'shop' hoặc 'em' còn khách hàng là 'chị'.
+"""
+
 PYTHON_RUN_SYS_MSG = "When you send a message containing Python code to python, it will be executed in a stateful Jupyter notebook environment. python will respond with the output of the execution or time out after 60.0 seconds. The drive at '/mnt/data' can be used to save and persist user files."
 
 
@@ -186,6 +186,7 @@ class PromptTemplate:
         full_text = ""
         for message in messages_clone:
             full_text += self.convert_message_to_prompt(message)
+        print(full_text)
         return full_text  # Do not strip because llama3 uses: \n\n before content
 
     def get_end_token_to_token_id(self, tokenizer: Any) -> Dict[str, int]:

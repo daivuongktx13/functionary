@@ -311,7 +311,7 @@ class Llama31Template(PromptTemplate):
             tool_calls.append(
                 {
                     "function": {"name": func_name, "arguments": arguments},
-                    "id": prompt_utils.get_random_tool_call_id(),
+                    "id": prompt_utils.get_random_tool_call_id(func_name),
                     "type": "function",
                 }
             )
@@ -323,14 +323,16 @@ class Llama31Template(PromptTemplate):
         role = message["role"]
         content = message.get("content", None)
         if role == "tool":
-            tool_name = message["name"]
-            content = f"name={tool_name}\n{content}"
+            tool_call_id = message["tool_call_id"]
+            data = json.loads(content)
+            content = f"function={data['name']}\ntool_call_id={tool_call_id}\nresponse=\"{data['content']}\""
+            role = "ipython"
 
         prompt_template = (
             "<|start_header_id|>%s<|end_header_id|>\n\n{text}<|eot_id|>" % role
         )
 
-        if role in ["user", "system", "tool"]:
+        if role in ["user", "system", "ipython"]:
             return prompt_template.format(text=content)
 
         assert role == "assistant"

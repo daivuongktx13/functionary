@@ -165,8 +165,9 @@ def get_text_delta_response(
     }
 
 
-def get_random_tool_call_id():
-    return "call_" + "".join(
+def get_random_tool_call_id(name = None):
+    prefix = f"{name}_" if name else "call_"
+    return prefix + "".join(
         [random.choice(string.ascii_letters + string.digits) for _ in range(24)]
     )
 
